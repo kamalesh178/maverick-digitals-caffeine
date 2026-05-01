@@ -1,0 +1,68 @@
+type UpdatePostRequest = 
+ record {
+   author: text;
+   category: text;
+   content: text;
+   excerpt: text;
+   featuredImageUrl: text;
+   id: PostId;
+   publishDate: Timestamp;
+   readTime: nat;
+   title: text;
+ };
+type Timestamp = int;
+type PostId = nat;
+type InquiryId = nat;
+type CreatePostRequest = 
+ record {
+   author: text;
+   category: text;
+   content: text;
+   excerpt: text;
+   featuredImageUrl: text;
+   publishDate: Timestamp;
+   readTime: nat;
+   title: text;
+ };
+type CreateInquiryRequest = 
+ record {
+   company: text;
+   email: text;
+   message: text;
+   name: text;
+   phone: text;
+   serviceInterested: text;
+ };
+type ContactInquiry = 
+ record {
+   company: text;
+   email: text;
+   id: InquiryId;
+   message: text;
+   name: text;
+   phone: text;
+   serviceInterested: text;
+   timestamp: Timestamp;
+ };
+type BlogPost = 
+ record {
+   author: text;
+   category: text;
+   content: text;
+   excerpt: text;
+   featuredImageUrl: text;
+   id: PostId;
+   publishDate: Timestamp;
+   readTime: nat;
+   title: text;
+ };
+service : {
+  createBlogPost: (req: CreatePostRequest) -> (BlogPost);
+  deleteBlogPost: (id: PostId) -> (bool);
+  getAllBlogPosts: () -> (vec BlogPost) query;
+  getAllContactInquiries: () -> (vec ContactInquiry) query;
+  getBlogPostById: (id: PostId) -> (opt BlogPost) query;
+  getBlogPostsByCategory: (category: text) -> (vec BlogPost) query;
+  submitContactInquiry: (req: CreateInquiryRequest) -> (ContactInquiry);
+  updateBlogPost: (req: UpdatePostRequest) -> (bool);
+}

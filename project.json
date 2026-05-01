@@ -1,0 +1,27 @@
+{
+  "overview": "Maverick Digitals — a premium dark-themed digital marketing agency website for a Mumbai-based agency (founded 2024). Features 5 pages: Home, About, Services, Blog, and Contact, all redesigned with a dark aesthetic matching the Intellix AI agency template style — near-black backgrounds, white text, purple-to-cyan gradient accents, glass-morphism cards, and smooth CSS animations.",
+  "features": [
+    "Dark theme with near-black background and white typography",
+    "Purple-to-cyan gradient accents on CTAs and headlines",
+    "Glass-morphism cards across all sections",
+    "7 services displayed in a clean card grid",
+    "Smooth scroll-triggered fade-in animations",
+    "Fully functional contact form connected to backend",
+    "Blog with 3 posts and visible thumbnails",
+    "Team section with Muskan Rathod and Dhaval Shah",
+    "Stats: 10M+ Views, 35+ Brands Scaled, Founded 2024",
+    "Instagram and LinkedIn social links"
+  ],
+  "category": "agency-marketing",
+  "tags": [
+    "agency",
+    "dark-theme",
+    "digital-marketing",
+    "react",
+    "motoko",
+    "tailwind",
+    "animations",
+    "gradient"
+  ],
+  "last_updated": "2026-05-01T10:07:59.077Z"
+}

@@ -1,0 +1,46 @@
+// Version: 1.0.0
+type BlogPost__62103675 =
+  {
+    author : Text;
+    category : Text;
+    content : Text;
+    excerpt : Text;
+    featuredImageUrl : Text;
+    id : PostId__937186069;
+    publishDate : Timestamp__528400788;
+    readTime : Nat;
+    title : Text
+  };
+type ContactInquiry__145825781 =
+  {
+    company : Text;
+    email : Text;
+    id : InquiryId__837731122;
+    message : Text;
+    name : Text;
+    phone : Text;
+    serviceInterested : Text;
+    timestamp : Timestamp__528400788
+  };
+type InquiryId__837731122 = Nat;
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type PostId__937186069 = Nat;
+type Timestamp__528400788 = Int;
+actor {
+  stable inquiries :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?ContactInquiry__145825781]];
+      var elementIndex : Nat__490723111
+    };
+  stable nextInquiryId : {var value : Nat};
+  stable nextPostId : {var value : Nat};
+  stable posts :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?BlogPost__62103675]];
+      var elementIndex : Nat__490723111
+    };
+  stable seededNextId : Nat
+};
