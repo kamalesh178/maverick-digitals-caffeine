@@ -92,7 +92,10 @@ export function useInView(
 
 /**
  * useScrollProgress — returns scroll progress 0-1.
- * Uses RAF to batch updates and avoid per-pixel re-renders.
+ *
+ * Uses RAF internally to batch React state updates instead of firing
+ * a setState on every scroll event (which was causing expensive re-renders
+ * on every pixel of scroll).
  */
 export function useScrollProgress(): number {
   const [progress, setProgress] = useState(0);
@@ -101,6 +104,7 @@ export function useScrollProgress(): number {
 
   useEffect(() => {
     const onScroll = () => {
+      // Only schedule one RAF update per scroll burst
       if (pendingUpdateRef.current) return;
       pendingUpdateRef.current = true;
 
@@ -114,7 +118,7 @@ export function useScrollProgress(): number {
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    onScroll(); // initial read
     return () => {
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(rafRef.current);
@@ -126,6 +130,7 @@ export function useScrollProgress(): number {
 
 /**
  * useParallaxOffset — CSS translateY based on scroll progress.
+ * speed 0.3 = element moves at 30% of scroll speed.
  */
 export function useParallaxOffset(speed = 0.3): string {
   const progress = useScrollProgress();
@@ -139,6 +144,10 @@ export function useParallaxOffset(speed = 0.3): string {
 
 /**
  * useScrollVelocity — normalized scroll velocity 0-1.
+ *
+ * Uses a single shared RAF loop for smooth per-frame tracking.
+ * Does NOT add a separate scroll listener — velocity is derived
+ * entirely from RAF frame deltas to avoid listener contention.
  */
 export function useScrollVelocity(): number {
   const [velocity, setVelocity] = useState(0);

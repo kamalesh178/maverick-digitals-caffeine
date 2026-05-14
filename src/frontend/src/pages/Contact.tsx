@@ -1,43 +1,89 @@
+import { AnimatedSection } from "@/components/AnimatedSection";
 import { submitContactInquiry } from "@/lib/backend";
+import {
+  AlertCircle,
+  CheckCircle,
+  ChevronDown,
+  Loader2,
+  Send,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { type FormEvent, useState } from "react";
+import TextReveal from "../components/TextReveal";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Constants ─────────────────────────────────────────────────────────────────────
 
 const SERVICES_OPTIONS = [
+  "Digital Marketing",
   "Social Media Management",
   "Performance Marketing",
-  "UGC Content Creation",
-  "AI-Powered Strategy",
-  "Web & App Development",
-  "Brand Management",
+  "Website Design & Development",
   "Custom Software Development",
+  "Brand Management",
+  "AI-Powered Solutions",
+];
+
+const INFO_CARDS = [
+  {
+    label: "WhatsApp",
+    sublabel: "Reach us directly on WhatsApp",
+    lines: ["+91-8779799255", "+91-9619818332"],
+    links: [
+      "https://wa.me/918779799255?text=Hi! I'm interested in Maverick Digitals' services.",
+      "https://wa.me/919619818332?text=Hi! I'm interested in Maverick Digitals' services.",
+    ],
+  },
+  {
+    label: "Location",
+    sublabel: "Our home base",
+    lines: ["Mumbai, Maharashtra", "India"],
+    links: [],
+  },
+  {
+    label: "Office Hours",
+    sublabel: "Our working hours",
+    lines: ["Mon – Sat", "9:00 AM – 7:00 PM IST"],
+    links: [],
+  },
+];
+
+const SOCIALS = [
+  {
+    label: "Instagram",
+    sublabel: "@maverickdigitalsagency",
+    href: "https://www.instagram.com/maverickdigitalsagency/",
+  },
+  {
+    label: "LinkedIn",
+    sublabel: "Maverick Digitals",
+    href: "https://www.linkedin.com/company/maverick-digitals/",
+  },
 ];
 
 const FAQS = [
   {
     q: "What services does Maverick Digitals offer?",
-    a: "We offer social media management, performance marketing (Meta & Google Ads), UGC content creation, AI-powered strategy, web & app development, brand management, and custom software development.",
+    a: "We provide a comprehensive suite of seven core services: Digital Marketing, Social Media Management, Performance Marketing, Website Design & Development, Custom Software Development, Brand Management, and AI-Powered Solutions. Each is built to deliver measurable business outcomes — not just activity.",
   },
   {
-    q: "How quickly can you get started?",
-    a: "We typically onboard new clients within 3–5 business days after the initial strategy call.",
+    q: "How soon can I expect to see results?",
+    a: "Most clients begin seeing meaningful traction within the first 30 to 60 days. Full campaign momentum typically develops over 90 days as we gather data, refine targeting, and optimise creative. We establish clear benchmarks at the outset so you always know what progress looks like.",
   },
   {
-    q: "Do you work with brands outside India?",
-    a: "Yes, we work with brands globally. Our core team is based in Mumbai but we operate across multiple markets.",
+    q: "How is your pricing structured?",
+    a: "Every engagement is scoped around your specific objectives and budget. We work with bootstrapped founders and enterprise teams alike. Book a complimentary strategy session and we will recommend the right service configuration with full transparency on investment from day one.",
   },
   {
-    q: "What is your minimum engagement?",
-    a: "Our minimum engagement is 3 months, as digital marketing results compound over time.",
+    q: "Do you work with small and early-stage businesses?",
+    a: "Absolutely. Some of our strongest results come from founders who started lean and scaled aggressively with the right strategy. If you are serious about growth, we are serious about you. The size of your business today does not define what it can become with the right partner.",
   },
   {
-    q: "How do you measure campaign success?",
-    a: "We track ROAS, CPM, CTR, follower growth, engagement rate, and custom KPIs specific to each client's goals.",
+    q: "What is the best way to get started?",
+    a: "Complete the enquiry form on this page or reach us via WhatsApp for the fastest response. We will schedule a free 30-minute strategy session to understand your brand, your goals, and map out an initial growth roadmap. There is no obligation — just genuine insight and a clear next step.",
   },
 ];
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Types ──────────────────────────────────────────────────────────────────────────
 
 interface FormData {
   name: string;
@@ -59,7 +105,57 @@ const INITIAL_FORM: FormData = {
   message: "",
 };
 
-// ─── FAQ Item ─────────────────────────────────────────────────────────────────
+// ─── Input class constants (white theme) ─────────────────────────────────────────────
+
+const inputBase =
+  "w-full bg-white border text-[#1E3A8A] placeholder:text-[#9CA3AF] text-sm rounded-md px-4 py-3 focus:outline-none transition-colors duration-200 appearance-none";
+const inputNormal =
+  "border-[#E2E8F0] focus:border-[#2563EB] focus:ring-2 focus:ring-[rgba(37,99,235,0.1)]";
+const inputError =
+  "border-red-400 focus:border-red-500 placeholder:text-red-300";
+
+// ─── Sub-components ───────────────────────────────────────────────────────────────────
+
+function FieldWrapper({
+  id,
+  label,
+  required,
+  error,
+  children,
+}: {
+  id: string;
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label
+        htmlFor={id}
+        className="text-[#374151] text-xs font-semibold uppercase tracking-wider"
+      >
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      {children}
+      <AnimatePresence>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex items-center gap-1.5 text-red-500 text-xs mt-1"
+            data-ocid={`${id}-field-error`}
+          >
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            {error}
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
   const [open, setOpen] = useState(false);
@@ -75,76 +171,35 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
       }}
     >
       <div
-        style={{
-          background: open ? "#1a1a1a" : "#111111",
-          border: `1px solid ${open ? "rgba(124,58,237,0.3)" : "rgba(255,255,255,0.08)"}`,
-          borderRadius: "12px",
-          overflow: "hidden",
-          transition: "border-color 0.2s ease, background 0.2s ease",
-        }}
+        className={[
+          "rounded-xl border overflow-hidden transition-all duration-300",
+          open
+            ? "bg-[#EFF6FF] border-[rgba(37,99,235,0.3)]"
+            : "bg-white border-[#E2E8F0] hover:border-[rgba(37,99,235,0.25)]",
+        ].join(" ")}
       >
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
+          className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
           aria-expanded={open}
           data-ocid={`faq-item-${index + 1}`}
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "16px",
-            padding: "20px 24px",
-            textAlign: "left",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            position: "relative",
-            zIndex: 1,
-            pointerEvents: "auto",
-          }}
         >
           <span
-            style={{
-              fontWeight: 700,
-              fontSize: "15px",
-              color: open ? "#a78bfa" : "#ffffff",
-              transition: "color 0.2s ease",
-              lineHeight: 1.4,
-            }}
+            className={`font-semibold text-base transition-colors duration-200 ${
+              open ? "text-[#2563EB]" : "text-[#1E3A8A]"
+            }`}
           >
             {q}
           </span>
           <span
-            style={{
-              width: "28px",
-              height: "28px",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              background: open
-                ? "linear-gradient(135deg, #7c3aed, #06b6d4)"
-                : "rgba(255,255,255,0.08)",
-              color: "white",
-              transition: "transform 0.3s ease, background 0.2s ease",
-              transform: open ? "rotate(180deg)" : "rotate(0deg)",
-            }}
+            className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+              open
+                ? "bg-[#EFF6FF] text-[#2563EB] rotate-180 border border-[rgba(37,99,235,0.2)]"
+                : "bg-[#F1F5F9] text-[#6B7280] border border-[#E2E8F0]"
+            }`}
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
+            <ChevronDown className="w-4 h-4" />
           </span>
         </button>
         <AnimatePresence initial={false}>
@@ -155,22 +210,10 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-              style={{ overflow: "hidden" }}
+              className="overflow-hidden"
             >
-              <div
-                style={{
-                  padding: "0 24px 20px",
-                  borderTop: "1px solid rgba(255,255,255,0.06)",
-                }}
-              >
-                <p
-                  style={{
-                    color: "rgba(255,255,255,0.6)",
-                    fontSize: "14px",
-                    lineHeight: 1.7,
-                    marginTop: "16px",
-                  }}
-                >
+              <div className="px-6 pb-6 pt-0 border-t border-[#E2E8F0]">
+                <p className="text-[#374151] text-sm leading-relaxed pt-4">
                   {a}
                 </p>
               </div>
@@ -182,32 +225,7 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
   );
 }
 
-// ─── Input styles (inline, no oklch) ─────────────────────────────────────────
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "12px 16px",
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(255,255,255,0.12)",
-  borderRadius: "8px",
-  color: "#ffffff",
-  fontSize: "15px",
-  fontFamily: "Inter, sans-serif",
-  outline: "none",
-  transition: "border-color 0.2s ease, box-shadow 0.2s ease",
-  position: "relative",
-  zIndex: 10,
-  pointerEvents: "auto",
-  cursor: "text",
-  boxSizing: "border-box",
-};
-
-const inputErrorStyle: React.CSSProperties = {
-  ...inputStyle,
-  border: "1px solid rgba(239,68,68,0.7)",
-};
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
+// ─── Main Page ──────────────────────────────────────────────────────────────────────
 
 export default function Contact() {
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
@@ -215,7 +233,6 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -275,1154 +292,542 @@ export default function Contact() {
     }
   };
 
-  const getFocusStyle = (field: string): React.CSSProperties => ({
-    borderColor: focusedField === field ? "rgba(124,58,237,0.6)" : undefined,
-    boxShadow:
-      focusedField === field ? "0 0 0 3px rgba(124,58,237,0.15)" : undefined,
-  });
-
   return (
     <div
-      style={{ minHeight: "100vh", background: "#0a0a0a", color: "#ffffff" }}
+      className="min-h-screen"
+      style={{ background: "#FFFFFF", color: "#374151" }}
     >
-      {/* ── Hero ──────────────────────────────────────────────────── */}
+      {/* ── Hero ───────────────────────────────────────────────── */}
       <section
-        style={{
-          position: "relative",
-          paddingTop: "120px",
-          paddingBottom: "64px",
-          overflow: "hidden",
-        }}
+        className="relative pt-28 pb-20 overflow-hidden"
+        style={{ background: "#FFFFFF" }}
       >
-        {/* Subtle grid */}
+        {/* Fine grid */}
         <div
+          className="absolute inset-0 pointer-events-none"
           style={{
-            position: "absolute",
-            inset: 0,
             backgroundImage:
-              "linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px)",
+              "linear-gradient(rgba(37,99,235,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,0.03) 1px, transparent 1px)",
             backgroundSize: "60px 60px",
-            pointerEvents: "none",
-            opacity: 0.6,
           }}
+          aria-hidden="true"
         />
-        {/* Glow blobs */}
+        {/* Radial top glow */}
         <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] pointer-events-none"
           style={{
-            position: "absolute",
-            top: "10%",
-            left: "25%",
-            width: "400px",
-            height: "400px",
-            borderRadius: "50%",
-            background: "rgba(124,58,237,0.08)",
-            filter: "blur(120px)",
-            pointerEvents: "none",
+            background:
+              "radial-gradient(ellipse 70% 60% at 50% 0%, rgba(37,99,235,0.06) 0%, transparent 70%)",
           }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: "0",
-            right: "20%",
-            width: "300px",
-            height: "300px",
-            borderRadius: "50%",
-            background: "rgba(6,182,212,0.06)",
-            filter: "blur(100px)",
-            pointerEvents: "none",
-          }}
+          aria-hidden="true"
         />
 
-        <div
-          style={{
-            maxWidth: "960px",
-            margin: "0 auto",
-            padding: "0 24px",
-            textAlign: "center",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
+        <div className="container mx-auto max-w-5xl px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
           >
-            {/* Badge */}
-            <div style={{ marginBottom: "20px" }}>
-              <span
-                style={{
-                  display: "inline-block",
-                  padding: "6px 16px",
-                  borderRadius: "100px",
-                  border: "1px solid rgba(124,58,237,0.3)",
-                  background: "rgba(124,58,237,0.1)",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  letterSpacing: "0.2em",
-                  textTransform: "uppercase",
-                  color: "#a78bfa",
-                }}
-              >
-                Contact
-              </span>
-            </div>
+            <span className="inline-flex items-center gap-2.5 text-xs font-bold tracking-[0.18em] uppercase text-[#2563EB] mb-6">
+              <span className="w-10 h-px bg-[#2563EB]/30" />
+              Get In Touch
+              <span className="w-10 h-px bg-[#2563EB]/30" />
+            </span>
 
-            <h1
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontWeight: 900,
-                fontSize: "clamp(48px, 7vw, 84px)",
-                lineHeight: 1,
-                letterSpacing: "-0.02em",
-                marginBottom: "24px",
-              }}
-            >
-              <span style={{ color: "#ffffff" }}>Let's </span>
-              <span
-                style={{
-                  background: "linear-gradient(135deg, #a78bfa, #67e8f9)",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Work Together
-              </span>
-            </h1>
+            <TextReveal
+              text="Let's Build Something Exceptional."
+              as="h1"
+              className="font-black text-5xl sm:text-6xl lg:text-7xl leading-[1.05] tracking-tight mb-6 text-[#1E3A8A]"
+              staggerMs={50}
+            />
 
-            <p
-              style={{
-                color: "rgba(255,255,255,0.6)",
-                fontSize: "18px",
-                maxWidth: "560px",
-                margin: "0 auto",
-                lineHeight: 1.7,
-              }}
-            >
-              Ready to scale your brand? Drop us a message and we'll be in touch
-              within 24 hours.
+            <p className="text-[#374151] text-xl sm:text-2xl max-w-2xl mx-auto leading-relaxed">
+              Ready to build something remarkable?{" "}
+              <span className="text-[#1E3A8A] font-semibold">
+                Let's connect.
+              </span>{" "}
+              Schedule a complimentary session — clear thinking, zero fluff.
             </p>
           </motion.div>
-        </div>
-      </section>
 
-      {/* ── Main Content: Info + Form ──────────────────────────────── */}
-      <section style={{ padding: "48px 0 80px" }}>
-        <div
-          style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
-            padding: "0 24px",
-            display: "grid",
-            gridTemplateColumns: "1fr 2fr",
-            gap: "40px",
-            alignItems: "start",
-          }}
-          className="contact-grid"
-        >
-          {/* ── Left column: info cards ── */}
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-          >
-            {/* WhatsApp Card */}
-            <div
-              style={{
-                background: "#111",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "16px",
-                padding: "24px",
-              }}
-              data-ocid="contact-whatsapp-card"
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  marginBottom: "12px",
-                }}
-              >
-                <div
-                  style={{
-                    width: "36px",
-                    height: "36px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                    flexShrink: 0,
-                  }}
-                />
-                <h3
-                  style={{
-                    fontWeight: 700,
-                    fontSize: "15px",
-                    color: "#ffffff",
-                    margin: 0,
-                  }}
-                >
-                  WhatsApp Us
-                </h3>
-              </div>
-              <p
-                style={{
-                  color: "rgba(255,255,255,0.6)",
-                  fontSize: "14px",
-                  marginBottom: "4px",
-                }}
-              >
-                +91 87797 99255
-              </p>
-              <p
-                style={{
-                  color: "rgba(255,255,255,0.6)",
-                  fontSize: "14px",
-                  marginBottom: "16px",
-                }}
-              >
-                +91 96198 18332
-              </p>
-              <a
-                href="https://wa.me/918779799255?text=Hi! I'm interested in Maverick Digitals' services."
-                target="_blank"
-                rel="noopener noreferrer"
-                data-ocid="contact-wa-cta"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: "#4ade80",
-                  textDecoration: "none",
-                  transition: "opacity 0.2s ease",
-                }}
-              >
-                Send Message →
-              </a>
-            </div>
-
-            {/* Email Card */}
-            <div
-              style={{
-                background: "#111",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "16px",
-                padding: "24px",
-              }}
-              data-ocid="contact-email-card"
-            >
-              <h3
-                style={{
-                  fontWeight: 700,
-                  fontSize: "15px",
-                  color: "#ffffff",
-                  marginBottom: "8px",
-                }}
-              >
-                Email Us
-              </h3>
-              <p
-                style={{
-                  color: "rgba(255,255,255,0.6)",
-                  fontSize: "14px",
-                  marginBottom: "12px",
-                }}
-              >
-                maverickdigitals18@gmail.com
-              </p>
-              <a
-                href="mailto:maverickdigitals18@gmail.com"
-                data-ocid="contact-email-link"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: "#a78bfa",
-                  textDecoration: "none",
-                }}
-              >
-                Send Email →
-              </a>
-            </div>
-
-            {/* Location Card */}
-            <div
-              style={{
-                background: "#111",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "16px",
-                padding: "24px",
-              }}
-              data-ocid="contact-location-card"
-            >
-              <h3
-                style={{
-                  fontWeight: 700,
-                  fontSize: "15px",
-                  color: "#ffffff",
-                  marginBottom: "8px",
-                }}
-              >
-                Location
-              </h3>
-              <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px" }}>
-                Mumbai, Maharashtra, India
-              </p>
-            </div>
-
-            {/* Social Card */}
-            <div
-              style={{
-                background: "#111",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "16px",
-                padding: "24px",
-              }}
-              data-ocid="contact-social-card"
-            >
-              <h3
-                style={{
-                  fontWeight: 700,
-                  fontSize: "15px",
-                  color: "#ffffff",
-                  marginBottom: "16px",
-                }}
-              >
-                Follow Us
-              </h3>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "12px",
-                }}
-              >
-                <a
-                  href="https://www.instagram.com/maverickdigitalsagency/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-ocid="social-instagram"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "10px 14px",
-                    borderRadius: "10px",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                    textDecoration: "none",
-                    transition: "border-color 0.2s ease",
-                  }}
-                >
-                  <div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        fontSize: "13px",
-                        color: "#ffffff",
-                      }}
-                    >
-                      Instagram
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: "rgba(255,255,255,0.5)",
-                        marginTop: "2px",
-                      }}
-                    >
-                      @maverickdigitalsagency
-                    </div>
-                  </div>
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="rgba(255,255,255,0.4)"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M7 17L17 7M17 7H7M17 7v10" />
-                  </svg>
-                </a>
-                <a
-                  href="https://www.linkedin.com/company/maverick-digitals/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-ocid="social-linkedin"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "10px 14px",
-                    borderRadius: "10px",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                    textDecoration: "none",
-                    transition: "border-color 0.2s ease",
-                  }}
-                >
-                  <div>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        fontSize: "13px",
-                        color: "#ffffff",
-                      }}
-                    >
-                      LinkedIn
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: "rgba(255,255,255,0.5)",
-                        marginTop: "2px",
-                      }}
-                    >
-                      Maverick Digitals
-                    </div>
-                  </div>
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="rgba(255,255,255,0.4)"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M7 17L17 7M17 7H7M17 7v10" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ── Right column: form ── */}
-          <motion.div
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
-          >
-            <AnimatePresence mode="wait">
-              {isSubmitted ? (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{ duration: 0.35 }}
-                  style={{
-                    background: "#111",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: "16px",
-                    padding: "64px 40px",
-                    textAlign: "center",
-                  }}
-                  data-ocid="contact-success-state"
-                >
-                  <div
-                    style={{
-                      width: "72px",
-                      height: "72px",
-                      borderRadius: "50%",
-                      background: "linear-gradient(135deg, #4ade80, #06b6d4)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      margin: "0 auto 24px",
-                      boxShadow: "0 0 32px rgba(74,222,128,0.25)",
-                    }}
-                  >
-                    <svg
-                      width="32"
-                      height="32"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="white"
-                      strokeWidth={2.5}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                  <h3
-                    style={{
-                      fontWeight: 800,
-                      fontSize: "28px",
-                      marginBottom: "12px",
-                      background: "linear-gradient(135deg, #a78bfa, #67e8f9)",
-                      WebkitBackgroundClip: "text",
-                      backgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                    }}
-                  >
-                    Message Sent!
-                  </h3>
-                  <p
-                    style={{
-                      color: "rgba(255,255,255,0.6)",
-                      fontSize: "15px",
-                      lineHeight: 1.7,
-                      maxWidth: "360px",
-                      margin: "0 auto 32px",
-                    }}
-                  >
-                    Our team will get back to you within{" "}
-                    <strong style={{ color: "#ffffff" }}>24 hours</strong>.
-                    Can't wait? Chat with us on WhatsApp.
-                  </p>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "12px",
-                      justifyContent: "center",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setIsSubmitted(false)}
-                      data-ocid="contact-send-another"
-                      style={{
-                        padding: "12px 24px",
-                        borderRadius: "8px",
-                        border: "1px solid rgba(255,255,255,0.15)",
-                        background: "transparent",
-                        color: "#ffffff",
-                        fontSize: "14px",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        transition: "border-color 0.2s ease",
-                        pointerEvents: "auto",
-                        position: "relative",
-                        zIndex: 1,
-                      }}
-                    >
-                      Send Another Message
-                    </button>
-                    <a
-                      href="https://wa.me/918779799255"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-ocid="contact-success-whatsapp"
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        padding: "12px 24px",
-                        borderRadius: "8px",
-                        background: "linear-gradient(135deg, #7c3aed, #06b6d4)",
-                        color: "#ffffff",
-                        fontSize: "14px",
-                        fontWeight: 600,
-                        textDecoration: "none",
-                        pointerEvents: "auto",
-                      }}
-                    >
-                      WhatsApp Us
-                    </a>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="form"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  {/* Form card */}
-                  <div
-                    style={{
-                      background: "#111",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: "16px",
-                      padding: "40px",
-                    }}
-                    data-ocid="contact-form-card"
-                  >
-                    {/* Header */}
-                    <div style={{ marginBottom: "32px" }}>
-                      <h2
-                        style={{
-                          fontWeight: 700,
-                          fontSize: "24px",
-                          color: "#ffffff",
-                          marginBottom: "8px",
-                        }}
-                      >
-                        Send Us a Message
-                      </h2>
-                      <p
-                        style={{
-                          color: "rgba(255,255,255,0.5)",
-                          fontSize: "14px",
-                        }}
-                      >
-                        Fill in the form below and we'll be in touch shortly.
-                      </p>
-                      <div
-                        style={{
-                          marginTop: "20px",
-                          height: "1px",
-                          background:
-                            "linear-gradient(90deg, rgba(124,58,237,0.3), rgba(6,182,212,0.3), transparent)",
-                        }}
-                      />
-                    </div>
-
-                    <form
-                      onSubmit={handleSubmit}
-                      noValidate
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "20px",
-                      }}
-                    >
-                      {/* Row 1: Name + Email */}
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "1fr 1fr",
-                          gap: "16px",
-                        }}
-                        className="form-row"
-                      >
-                        {/* Full Name */}
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "8px",
-                          }}
-                        >
-                          <label
-                            htmlFor="name"
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: 700,
-                              letterSpacing: "0.1em",
-                              textTransform: "uppercase",
-                              color: "rgba(255,255,255,0.5)",
-                            }}
-                          >
-                            Full Name{" "}
-                            <span style={{ color: "#f87171" }}>*</span>
-                          </label>
-                          <input
-                            id="name"
-                            name="name"
-                            type="text"
-                            value={form.name}
-                            onChange={handleChange}
-                            onFocus={() => setFocusedField("name")}
-                            onBlur={() => setFocusedField(null)}
-                            placeholder="Your full name"
-                            autoComplete="name"
-                            data-ocid="contact-name"
-                            style={{
-                              ...(errors.name ? inputErrorStyle : inputStyle),
-                              ...getFocusStyle("name"),
-                            }}
-                          />
-                          {errors.name && (
-                            <span
-                              data-ocid="name-field-error"
-                              style={{
-                                color: "#f87171",
-                                fontSize: "12px",
-                                fontWeight: 500,
-                              }}
-                            >
-                              {errors.name}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Email */}
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "8px",
-                          }}
-                        >
-                          <label
-                            htmlFor="email"
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: 700,
-                              letterSpacing: "0.1em",
-                              textTransform: "uppercase",
-                              color: "rgba(255,255,255,0.5)",
-                            }}
-                          >
-                            Email Address{" "}
-                            <span style={{ color: "#f87171" }}>*</span>
-                          </label>
-                          <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            onFocus={() => setFocusedField("email")}
-                            onBlur={() => setFocusedField(null)}
-                            placeholder="your@email.com"
-                            autoComplete="email"
-                            data-ocid="contact-email"
-                            style={{
-                              ...(errors.email ? inputErrorStyle : inputStyle),
-                              ...getFocusStyle("email"),
-                            }}
-                          />
-                          {errors.email && (
-                            <span
-                              data-ocid="email-field-error"
-                              style={{
-                                color: "#f87171",
-                                fontSize: "12px",
-                                fontWeight: 500,
-                              }}
-                            >
-                              {errors.email}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Row 2: Phone + Company */}
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "1fr 1fr",
-                          gap: "16px",
-                        }}
-                        className="form-row"
-                      >
-                        {/* Phone */}
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "8px",
-                          }}
-                        >
-                          <label
-                            htmlFor="phone"
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: 700,
-                              letterSpacing: "0.1em",
-                              textTransform: "uppercase",
-                              color: "rgba(255,255,255,0.5)",
-                            }}
-                          >
-                            Phone Number
-                          </label>
-                          <input
-                            id="phone"
-                            name="phone"
-                            type="tel"
-                            value={form.phone}
-                            onChange={handleChange}
-                            onFocus={() => setFocusedField("phone")}
-                            onBlur={() => setFocusedField(null)}
-                            placeholder="+91 XXXXXXXXXX"
-                            autoComplete="tel"
-                            data-ocid="contact-phone"
-                            style={{ ...inputStyle, ...getFocusStyle("phone") }}
-                          />
-                        </div>
-
-                        {/* Company */}
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "8px",
-                          }}
-                        >
-                          <label
-                            htmlFor="company"
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: 700,
-                              letterSpacing: "0.1em",
-                              textTransform: "uppercase",
-                              color: "rgba(255,255,255,0.5)",
-                            }}
-                          >
-                            Company{" "}
-                            <span
-                              style={{
-                                color: "rgba(255,255,255,0.3)",
-                                fontWeight: 400,
-                              }}
-                            >
-                              (optional)
-                            </span>
-                          </label>
-                          <input
-                            id="company"
-                            name="company"
-                            type="text"
-                            value={form.company}
-                            onChange={handleChange}
-                            onFocus={() => setFocusedField("company")}
-                            onBlur={() => setFocusedField(null)}
-                            placeholder="Your company name"
-                            autoComplete="organization"
-                            data-ocid="contact-company"
-                            style={{
-                              ...inputStyle,
-                              ...getFocusStyle("company"),
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Service dropdown */}
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "8px",
-                        }}
-                      >
-                        <label
-                          htmlFor="service"
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 700,
-                            letterSpacing: "0.1em",
-                            textTransform: "uppercase",
-                            color: "rgba(255,255,255,0.5)",
-                          }}
-                        >
-                          Service Interested In
-                        </label>
-                        <div style={{ position: "relative" }}>
-                          <select
-                            id="service"
-                            name="service"
-                            value={form.service}
-                            onChange={handleChange}
-                            onFocus={() => setFocusedField("service")}
-                            onBlur={() => setFocusedField(null)}
-                            data-ocid="contact-service"
-                            style={{
-                              ...inputStyle,
-                              cursor: "pointer",
-                              paddingRight: "40px",
-                              appearance: "none",
-                              WebkitAppearance: "none",
-                              ...getFocusStyle("service"),
-                            }}
-                          >
-                            <option value="" style={{ background: "#1a1a1a" }}>
-                              — Select a service —
-                            </option>
-                            {SERVICES_OPTIONS.map((s) => (
-                              <option
-                                key={s}
-                                value={s}
-                                style={{ background: "#1a1a1a" }}
-                              >
-                                {s}
-                              </option>
-                            ))}
-                          </select>
-                          <div
-                            style={{
-                              position: "absolute",
-                              right: "12px",
-                              top: "50%",
-                              transform: "translateY(-50%)",
-                              pointerEvents: "none",
-                              color: "rgba(255,255,255,0.4)",
-                            }}
-                          >
-                            <svg
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <path d="M6 9l6 6 6-6" />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Message */}
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "8px",
-                        }}
-                      >
-                        <label
-                          htmlFor="message"
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 700,
-                            letterSpacing: "0.1em",
-                            textTransform: "uppercase",
-                            color: "rgba(255,255,255,0.5)",
-                          }}
-                        >
-                          Message <span style={{ color: "#f87171" }}>*</span>
-                        </label>
-                        <textarea
-                          id="message"
-                          name="message"
-                          rows={5}
-                          value={form.message}
-                          onChange={handleChange}
-                          onFocus={() => setFocusedField("message")}
-                          onBlur={() => setFocusedField(null)}
-                          placeholder="Tell us about your project..."
-                          data-ocid="contact-message"
-                          style={{
-                            ...(errors.message ? inputErrorStyle : inputStyle),
-                            ...getFocusStyle("message"),
-                            resize: "none",
-                            cursor: "text",
-                          }}
-                        />
-                        {errors.message && (
-                          <span
-                            data-ocid="message-field-error"
-                            style={{
-                              color: "#f87171",
-                              fontSize: "12px",
-                              fontWeight: 500,
-                            }}
-                          >
-                            {errors.message}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Submit error */}
-                      <AnimatePresence>
-                        {submitError && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -6 }}
-                            data-ocid="contact-error-state"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "10px",
-                              padding: "14px 16px",
-                              borderRadius: "8px",
-                              background: "rgba(239,68,68,0.08)",
-                              border: "1px solid rgba(239,68,68,0.25)",
-                              color: "#f87171",
-                              fontSize: "14px",
-                              fontWeight: 500,
-                            }}
-                          >
-                            <svg
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <circle cx="12" cy="12" r="10" />
-                              <line x1="12" y1="8" x2="12" y2="12" />
-                              <line x1="12" y1="16" x2="12.01" y2="16" />
-                            </svg>
-                            {submitError}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Submit button */}
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        data-ocid="contact-submit"
-                        style={{
-                          width: "100%",
-                          padding: "14px",
-                          borderRadius: "8px",
-                          border: "none",
-                          background: isSubmitting
-                            ? "rgba(124,58,237,0.5)"
-                            : "linear-gradient(135deg, #7c3aed, #06b6d4)",
-                          color: "#ffffff",
-                          fontSize: "16px",
-                          fontWeight: 700,
-                          cursor: isSubmitting ? "not-allowed" : "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "10px",
-                          transition: "opacity 0.2s ease, box-shadow 0.2s ease",
-                          position: "relative",
-                          zIndex: 1,
-                          pointerEvents: "auto",
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isSubmitting)
-                            (
-                              e.currentTarget as HTMLButtonElement
-                            ).style.boxShadow =
-                              "0 0 32px rgba(124,58,237,0.45)";
-                        }}
-                        onMouseLeave={(e) => {
-                          (
-                            e.currentTarget as HTMLButtonElement
-                          ).style.boxShadow = "none";
-                        }}
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <svg
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                              style={{ animation: "spin 1s linear infinite" }}
-                            >
-                              <path d="M21 12a9 9 0 11-6.219-8.56" />
-                            </svg>
-                            Sending Message…
-                          </>
-                        ) : (
-                          <>
-                            Send Message
-                            <svg
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <line x1="22" y1="2" x2="11" y2="13" />
-                              <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                            </svg>
-                          </>
-                        )}
-                      </button>
-
-                      <p
-                        style={{
-                          textAlign: "center",
-                          color: "rgba(255,255,255,0.35)",
-                          fontSize: "12px",
-                          marginTop: "4px",
-                        }}
-                      >
-                        By submitting, you agree to our privacy policy. We never
-                        share your data.
-                      </p>
-                    </form>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── FAQ ───────────────────────────────────────────────────── */}
-      <section
-        style={{
-          padding: "80px 0",
-          borderTop: "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
-        <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0 24px" }}>
-          {/* Heading */}
+          {/* Quick stat bar */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
-            style={{ textAlign: "center", marginBottom: "48px" }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.55 }}
+            className="flex flex-wrap justify-center gap-10 mt-14"
           >
-            <span
-              style={{
-                display: "inline-block",
-                padding: "5px 14px",
-                borderRadius: "100px",
-                border: "1px solid rgba(124,58,237,0.3)",
-                background: "rgba(124,58,237,0.08)",
-                fontSize: "11px",
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "#a78bfa",
-                marginBottom: "16px",
-              }}
-            >
-              FAQ
-            </span>
-            <h2
-              style={{
-                fontWeight: 800,
-                fontSize: "clamp(28px, 4vw, 40px)",
-                color: "#ffffff",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Frequently Asked{" "}
-              <span
-                style={{
-                  background: "linear-gradient(135deg, #a78bfa, #67e8f9)",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Questions
-              </span>
-            </h2>
+            {[
+              { value: "48h", label: "Response Time" },
+              { value: "35+", label: "Brands Scaled" },
+              { value: "10M+", label: "Views Generated" },
+            ].map((stat, i) => (
+              <div key={stat.label} className="text-center">
+                <div
+                  className="font-black text-3xl text-[#2563EB]"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  {stat.value}
+                </div>
+                <div className="text-[#9CA3AF] text-xs font-semibold tracking-widest uppercase mt-1">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
           </motion.div>
+        </div>
+      </section>
 
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-            data-ocid="faq-list"
-          >
+      {/* ── Info Cards ──────────────────────────────────────────────── */}
+      <section className="pb-12" style={{ background: "#F8FAFC" }}>
+        <div className="container mx-auto max-w-5xl px-4 pt-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {INFO_CARDS.map((card, i) => (
+              <AnimatedSection
+                key={card.label}
+                variant="scale-up"
+                delay={i * 0.1}
+              >
+                <div className="h-full rounded-xl border border-[#E2E8F0] bg-white p-6 flex flex-col gap-2 transition-all duration-300 hover:border-[rgba(37,99,235,0.3)] hover:shadow-[0_4px_20px_rgba(37,99,235,0.08)]">
+                  <div className="flex flex-col gap-0.5 mb-1">
+                    <span className="text-xs font-bold tracking-[0.18em] uppercase text-[#2563EB]">
+                      {card.label}
+                    </span>
+                    <span className="text-xs text-[#9CA3AF]">
+                      {card.sublabel}
+                    </span>
+                  </div>
+                  {card.links.length > 0 ? (
+                    <div className="flex flex-col gap-1">
+                      {card.lines.map((line, li) => (
+                        <a
+                          key={line}
+                          href={card.links[li] ?? "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#1E3A8A] font-bold text-base hover:text-[#2563EB] transition-colors duration-200 underline-offset-2 hover:underline"
+                          data-ocid={`contact-wa-${li + 1}`}
+                        >
+                          {line}
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-0.5">
+                      {card.lines.map((line) => (
+                        <span
+                          key={line}
+                          className="text-[#1E3A8A] font-bold text-base"
+                        >
+                          {line}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Form + Social ────────────────────────────────────────────── */}
+      <section
+        className="py-16 border-t border-[#E2E8F0] relative overflow-hidden"
+        style={{ background: "#FFFFFF" }}
+      >
+        <div className="container mx-auto max-w-5xl px-4 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+            {/* Left: social + whatsapp cta */}
+            <AnimatedSection
+              variant="slide-left"
+              className="lg:col-span-2 flex flex-col gap-7"
+            >
+              {/* Social links */}
+              <div>
+                <h2 className="font-bold text-[#1E3A8A] text-xl mb-1">
+                  Find Us Online
+                </h2>
+                <p className="text-[#374151] text-sm leading-relaxed mb-5">
+                  Follow us for daily strategy insights, behind-the-scenes
+                  content, and growth inspiration.
+                </p>
+                <div className="flex flex-col gap-3">
+                  {SOCIALS.map(({ label, sublabel, href }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between px-5 py-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:border-[rgba(37,99,235,0.3)] hover:bg-[#EFF6FF] transition-all duration-200 group"
+                      data-ocid={`social-${label.toLowerCase()}`}
+                    >
+                      <div>
+                        <div className="font-bold text-sm text-[#1E3A8A] group-hover:text-[#2563EB] transition-colors duration-200">
+                          {label}
+                        </div>
+                        <div className="text-xs text-[#9CA3AF] mt-0.5">
+                          {sublabel}
+                        </div>
+                      </div>
+                      <svg
+                        className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all duration-200"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M7 17L17 7M17 7H7M17 7v10" />
+                      </svg>
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              {/* WhatsApp CTA card — keep green as brand color */}
+              <div className="rounded-xl border border-[#E2E8F0] bg-white p-6">
+                <div className="font-bold text-[#1E3A8A] text-base mb-1">
+                  Prefer a Direct Conversation?
+                </div>
+                <p className="text-[#374151] text-sm mb-4 leading-relaxed">
+                  Message us and we respond within minutes. Available Monday to
+                  Saturday, 9AM–7PM IST.
+                </p>
+                <a
+                  href="https://wa.me/918779799255?text=Hi! I want to grow my brand with Maverick Digitals."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-ocid="contact-whatsapp-cta"
+                >
+                  <button
+                    type="button"
+                    className="w-full bg-[#25D366] text-white font-semibold hover:bg-[#1ebe5d] transition-colors rounded-md px-8 py-3 text-sm"
+                  >
+                    Message Us on WhatsApp
+                  </button>
+                </a>
+              </div>
+
+              {/* Strategy session callout */}
+              <div className="hidden lg:flex rounded-xl border border-[rgba(37,99,235,0.15)] bg-[#EFF6FF] overflow-hidden relative">
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse at center, rgba(37,99,235,0.06) 0%, transparent 70%)",
+                  }}
+                />
+                <div className="relative flex flex-col items-center justify-center text-center p-7 w-full gap-1">
+                  <div className="font-black text-5xl text-[#2563EB] leading-none mb-1">
+                    Free
+                  </div>
+                  <div className="font-bold text-[#1E3A8A] text-sm">
+                    Free Strategy Session
+                  </div>
+                  <div className="text-[#9CA3AF] text-xs mt-0.5">
+                    Zero obligation. Just clear strategy.
+                  </div>
+                </div>
+              </div>
+            </AnimatedSection>
+
+            {/* Right: form */}
+            <AnimatedSection
+              variant="slide-right"
+              delay={0.1}
+              className="lg:col-span-3"
+            >
+              <AnimatePresence mode="wait">
+                {isSubmitted ? (
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0, scale: 0.97 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.97 }}
+                    transition={{ duration: 0.35 }}
+                  >
+                    <div
+                      className="rounded-xl border border-[#E2E8F0] bg-white p-12 text-center"
+                      data-ocid="contact-success-state"
+                    >
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                          delay: 0.15,
+                          type: "spring",
+                          stiffness: 200,
+                          damping: 15,
+                        }}
+                        className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-6 shadow-[0_0_24px_rgba(52,211,153,0.25)]"
+                      >
+                        <CheckCircle className="w-10 h-10 text-white" />
+                      </motion.div>
+                      <h3 className="font-black text-3xl text-[#1E3A8A] mb-3">
+                        Your Message Is With Us!
+                      </h3>
+                      <p className="text-[#374151] text-base leading-relaxed mb-8 max-w-sm mx-auto">
+                        Our team reviews every enquiry personally and responds
+                        within{" "}
+                        <span className="text-[#1E3A8A] font-semibold">
+                          24–48 hours.
+                        </span>{" "}
+                        Want a quicker response? Reach us directly on WhatsApp.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button
+                          type="button"
+                          onClick={() => setIsSubmitted(false)}
+                          className="border border-[#E2E8F0] text-[#1E3A8A] hover:border-[rgba(37,99,235,0.3)] hover:text-[#2563EB] transition-colors rounded-md px-6 py-2.5 text-sm font-semibold"
+                          data-ocid="contact-send-another"
+                        >
+                          Submit Another Enquiry
+                        </button>
+                        <a
+                          href="https://wa.me/918779799255"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <button
+                            type="button"
+                            className="bg-[#25D366] text-white font-semibold hover:bg-[#1ebe5d] transition-colors rounded-md px-6 py-2.5 text-sm"
+                          >
+                            Chat on WhatsApp
+                          </button>
+                        </a>
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="form"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <div
+                      className="rounded-xl border border-[#E2E8F0] bg-white p-8 sm:p-10 shadow-[0_4px_24px_rgba(37,99,235,0.06)]"
+                      data-ocid="contact-form-card"
+                    >
+                      {/* Form header */}
+                      <div className="mb-8">
+                        <h2 className="font-bold text-[#1E3A8A] text-2xl mb-1.5">
+                          Start the Conversation
+                        </h2>
+                        <p className="text-[#374151] text-sm">
+                          Complete the form and our team will follow up shortly.
+                        </p>
+                        <div className="mt-4 h-px bg-gradient-to-r from-[#2563EB]/30 via-[#3B82F6]/20 to-transparent" />
+                      </div>
+
+                      <form
+                        onSubmit={handleSubmit}
+                        className="space-y-5"
+                        noValidate
+                      >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                          <FieldWrapper
+                            id="name"
+                            label="Full Name"
+                            required
+                            error={errors.name}
+                          >
+                            <input
+                              id="name"
+                              name="name"
+                              type="text"
+                              value={form.name}
+                              onChange={handleChange}
+                              placeholder="Rahul Sharma"
+                              className={`${inputBase} ${errors.name ? inputError : inputNormal}`}
+                              data-ocid="contact-name"
+                              autoComplete="name"
+                            />
+                          </FieldWrapper>
+
+                          <FieldWrapper
+                            id="email"
+                            label="Email Address"
+                            required
+                            error={errors.email}
+                          >
+                            <input
+                              id="email"
+                              name="email"
+                              type="email"
+                              value={form.email}
+                              onChange={handleChange}
+                              placeholder="rahul@brand.com"
+                              className={`${inputBase} ${errors.email ? inputError : inputNormal}`}
+                              data-ocid="contact-email"
+                              autoComplete="email"
+                            />
+                          </FieldWrapper>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                          <FieldWrapper id="phone" label="Phone Number">
+                            <input
+                              id="phone"
+                              name="phone"
+                              type="tel"
+                              value={form.phone}
+                              onChange={handleChange}
+                              placeholder="+91 98765 43210"
+                              className={`${inputBase} ${inputNormal}`}
+                              data-ocid="contact-phone"
+                              autoComplete="tel"
+                            />
+                          </FieldWrapper>
+
+                          <FieldWrapper id="company" label="Company / Brand">
+                            <input
+                              id="company"
+                              name="company"
+                              type="text"
+                              value={form.company}
+                              onChange={handleChange}
+                              placeholder="Your Company Name"
+                              className={`${inputBase} ${inputNormal}`}
+                              data-ocid="contact-company"
+                              autoComplete="organization"
+                            />
+                          </FieldWrapper>
+                        </div>
+
+                        <FieldWrapper
+                          id="service"
+                          label="Service Interested In"
+                        >
+                          <div className="relative">
+                            <select
+                              id="service"
+                              name="service"
+                              value={form.service}
+                              onChange={handleChange}
+                              className={`${inputBase} ${inputNormal} pr-10 cursor-pointer`}
+                              data-ocid="contact-service"
+                            >
+                              <option
+                                value=""
+                                className="bg-white text-[#9CA3AF]"
+                              >
+                                — Select a service —
+                              </option>
+                              {SERVICES_OPTIONS.map((s) => (
+                                <option
+                                  key={s}
+                                  value={s}
+                                  className="bg-white text-[#1E3A8A]"
+                                >
+                                  {s}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]">
+                              <ChevronDown className="w-4 h-4" />
+                            </div>
+                          </div>
+                        </FieldWrapper>
+
+                        <FieldWrapper
+                          id="message"
+                          label="Message"
+                          required
+                          error={errors.message}
+                        >
+                          <textarea
+                            id="message"
+                            name="message"
+                            rows={5}
+                            value={form.message}
+                            onChange={handleChange}
+                            placeholder="Describe your brand goals, current challenges, and what success means to you. The more detail, the better."
+                            className={`${inputBase} ${errors.message ? inputError : inputNormal} resize-none`}
+                            data-ocid="contact-message"
+                          />
+                        </FieldWrapper>
+
+                        <AnimatePresence>
+                          {submitError && (
+                            <motion.div
+                              initial={{ opacity: 0, y: -6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -6 }}
+                              className="flex items-center gap-2.5 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium"
+                              data-ocid="contact-error-state"
+                            >
+                              <AlertCircle className="w-4 h-4 shrink-0" />
+                              {submitError}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="w-full flex items-center justify-center gap-2 bg-[#2563EB] text-white font-semibold hover:bg-[#1D4ED8] disabled:opacity-60 disabled:cursor-not-allowed transition-colors rounded-md px-8 py-3 shadow-[0_4px_16px_rgba(37,99,235,0.25)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.35)]"
+                          data-ocid="contact-submit"
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              Sending Message…
+                            </>
+                          ) : (
+                            <>
+                              Send Message
+                              <Send className="w-4 h-4" />
+                            </>
+                          )}
+                        </button>
+
+                        <p className="text-center text-[#9CA3AF] text-xs pt-1">
+                          By sending this enquiry, you agree to our{" "}
+                          <span className="text-[#6B7280] cursor-pointer hover:text-[#2563EB] transition-colors">
+                            privacy policy.
+                          </span>{" "}
+                          Your information is handled with complete
+                          confidentiality.
+                        </p>
+                      </form>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────── */}
+      <section
+        className="py-24 border-t border-[#E2E8F0] relative overflow-hidden"
+        style={{ background: "#F8FAFC" }}
+      >
+        <div className="container mx-auto max-w-3xl px-4 relative z-10">
+          <AnimatedSection variant="fade-up" className="mb-14 text-center">
+            <span className="inline-flex items-center gap-2.5 text-xs font-bold tracking-[0.18em] uppercase text-[#2563EB] mb-4">
+              <span className="w-8 h-px bg-[#2563EB]/30" />
+              FAQ
+              <span className="w-8 h-px bg-[#2563EB]/30" />
+            </span>
+            <TextReveal
+              text="Common Questions"
+              as="h2"
+              className="font-black text-4xl sm:text-5xl text-[#1E3A8A] mb-4"
+              staggerMs={60}
+            />
+            <p className="text-[#374151] text-lg max-w-xl mx-auto">
+              Answers to the questions we hear most from brands considering
+              working with us.
+            </p>
+          </AnimatedSection>
+
+          <div className="space-y-3" data-ocid="faq-list">
             {FAQS.map((faq, i) => (
               <FaqItem key={faq.q} q={faq.q} a={faq.a} index={i} />
             ))}
@@ -1433,59 +838,27 @@ export default function Contact() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4, duration: 0.45 }}
-            style={{ textAlign: "center", marginTop: "48px" }}
+            className="text-center mt-12"
           >
-            <p
-              style={{
-                color: "rgba(255,255,255,0.5)",
-                fontSize: "14px",
-                marginBottom: "16px",
-              }}
-            >
-              Still have questions?
+            <p className="text-[#6B7280] text-sm mb-4">
+              Didn't find the answer you needed?
             </p>
             <a
               href="https://wa.me/918779799255?text=Hi! I have a question about Maverick Digitals."
               target="_blank"
               rel="noopener noreferrer"
               data-ocid="faq-whatsapp-cta"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "12px 28px",
-                borderRadius: "8px",
-                border: "1px solid rgba(124,58,237,0.35)",
-                background: "rgba(124,58,237,0.08)",
-                color: "#a78bfa",
-                fontSize: "14px",
-                fontWeight: 600,
-                textDecoration: "none",
-                transition: "border-color 0.2s ease, background 0.2s ease",
-                pointerEvents: "auto",
-              }}
             >
-              Ask on WhatsApp
+              <button
+                type="button"
+                className="border border-[#E2E8F0] text-[#1E3A8A] hover:border-[rgba(37,99,235,0.3)] hover:text-[#2563EB] transition-colors rounded-md px-8 py-3 text-sm font-semibold bg-white"
+              >
+                Reach Us on WhatsApp
+              </button>
             </a>
           </motion.div>
         </div>
       </section>
-
-      {/* Responsive styles */}
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @media (max-width: 768px) {
-          .contact-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .form-row {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

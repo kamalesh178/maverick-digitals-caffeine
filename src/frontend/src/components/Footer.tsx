@@ -22,14 +22,18 @@ const SOCIAL_LINKS = [
     label: "Instagram",
     href: "https://www.instagram.com/maverickdigitalsagency/",
     icon: Instagram,
-    hoverStyle:
-      "hover:bg-gradient-to-br from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]",
+    hoverBg:
+      "hover:bg-gradient-to-br hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7]",
+    hoverText: "hover:text-white",
+    hoverBorder: "hover:border-transparent",
   },
   {
     label: "LinkedIn",
     href: "https://www.linkedin.com/company/maverick-digitals/",
     icon: Linkedin,
-    hoverStyle: "hover:bg-[#0A66C2]",
+    hoverBg: "hover:bg-[#0A66C2]",
+    hoverText: "hover:text-white",
+    hoverBorder: "hover:border-transparent",
   },
 ];
 
@@ -40,51 +44,77 @@ const WHATSAPP_NUMBERS = [
 
 export function Footer() {
   const year = new Date().getFullYear();
-  const hostname =
-    typeof window !== "undefined" ? window.location.hostname : "";
+  const hostname = window.location.hostname;
   const caffeineUrl = `https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`;
 
   return (
     <footer
-      className="relative overflow-hidden"
       style={{
-        background: "#0a0a0a",
-        borderTop: "1px solid rgba(255,255,255,0.08)",
+        background: "#F8FAFC",
+        borderTop: "1px solid #E2E8F0",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      {/* Gradient top border accent */}
+      {/* Top gradient rule */}
       <div
-        className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
         style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "1px",
           background:
-            "linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.5) 30%, rgba(6,182,212,0.5) 70%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.35) 30%, rgba(59,130,246,0.35) 70%, transparent 100%)",
+          pointerEvents: "none",
         }}
       />
 
-      {/* Subtle grid texture */}
-      <div className="absolute inset-0 hero-grid opacity-30 pointer-events-none" />
-
-      {/* ─── CTA Banner ────────────────────────────── */}
-      <div className="relative py-20 px-4">
-        {/* Radial glow */}
+      {/* ─── CTA Banner ─────────────────────────────── */}
+      <div className="relative py-24 px-4">
         <div
-          className="absolute inset-0 pointer-events-none"
           style={{
+            position: "absolute",
+            inset: 0,
             background:
-              "radial-gradient(ellipse 70% 70% at 50% 0%, rgba(124,58,237,0.08) 0%, transparent 70%)",
+              "radial-gradient(ellipse 60% 60% at 50% 0%, rgba(37,99,235,0.04) 0%, transparent 70%)",
+            pointerEvents: "none",
           }}
         />
-        <div className="relative container mx-auto max-w-4xl text-center">
+        <div className="relative container mx-auto max-w-3xl text-center">
           <p
-            className="text-xs font-semibold uppercase tracking-[0.2em] mb-3"
-            style={{ color: "rgba(167,139,250,0.8)" }}
+            style={{
+              fontSize: "11px",
+              letterSpacing: "0.22em",
+              textTransform: "uppercase" as const,
+              color: "#2563EB",
+              marginBottom: "16px",
+              fontWeight: 500,
+            }}
           >
             Let's grow together
           </p>
-          <h2 className="font-black text-4xl sm:text-5xl lg:text-6xl text-white mb-5 leading-[1.1]">
-            Ready to Scale Your <span className="gradient-text">Brand?</span>
+          <h2
+            className="font-display"
+            style={{
+              fontSize: "clamp(36px, 6vw, 60px)",
+              fontWeight: 700,
+              color: "#1a2332",
+              lineHeight: 1.1,
+              marginBottom: "20px",
+            }}
+          >
+            Ready to Go <span style={{ color: "#2563EB" }}>Viral?</span>
           </h2>
-          <p className="text-white/60 text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+          <p
+            style={{
+              color: "#64748B",
+              fontSize: "16px",
+              lineHeight: 1.7,
+              maxWidth: "480px",
+              margin: "0 auto 40px",
+            }}
+          >
             Stop waiting while your competitors dominate. Let's build your viral
             growth strategy — starting today.
           </p>
@@ -95,11 +125,32 @@ export function Footer() {
                 href={`https://wa.me/${number}?text=Hi! I'm interested in Maverick Digitals' services.`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 hover:-translate-y-0.5"
                 style={{
-                  border: "1px solid rgba(124,58,237,0.3)",
-                  color: "#a78bfa",
-                  background: "rgba(124,58,237,0.06)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "12px 24px",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(37,99,235,0.3)",
+                  color: "#2563EB",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  letterSpacing: "0.04em",
+                  textDecoration: "none",
+                  transition: "background 0.25s ease, border-color 0.25s ease",
+                  background: "rgba(37,99,235,0.05)",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.background =
+                    "rgba(37,99,235,0.12)";
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                    "rgba(37,99,235,0.6)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.background =
+                    "rgba(37,99,235,0.05)";
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                    "rgba(37,99,235,0.3)";
                 }}
                 data-ocid="footer-whatsapp"
               >
@@ -112,10 +163,14 @@ export function Footer() {
       </div>
 
       {/* ─── Footer Grid ──────────────────────────── */}
-      <div className="relative container mx-auto max-w-7xl px-5 pt-12 pb-14">
+      <div className="relative container mx-auto max-w-7xl px-6 pt-12 pb-14">
         <div
-          className="w-full h-px mb-12"
-          style={{ background: "rgba(255,255,255,0.06)" }}
+          style={{
+            width: "100%",
+            height: "1px",
+            background: "#E2E8F0",
+            marginBottom: "48px",
+          }}
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -126,18 +181,30 @@ export function Footer() {
               className="inline-block"
               aria-label="Maverick Digitals home"
             >
-              <span className="font-bold text-xl text-white">
-                Maverick <span className="gradient-text">Digitals</span>
+              <span
+                className="font-display"
+                style={{ fontSize: "18px", fontWeight: 700, color: "#1a2332" }}
+              >
+                Maverick <span style={{ color: "#2563EB" }}>Digitals</span>
               </span>
             </Link>
-            <p className="text-white/50 text-sm leading-relaxed">
+            <p
+              style={{
+                color: "#64748B",
+                fontSize: "14px",
+                lineHeight: 1.7,
+              }}
+            >
               Mumbai's leading digital marketing agency. We engineer viral
               growth for brands that refuse to be ordinary.
             </p>
-            <div className="flex items-start gap-2 text-white/50 text-sm">
+            <div
+              className="flex items-start gap-2"
+              style={{ color: "#64748B", fontSize: "14px" }}
+            >
               <MapPin
                 className="w-4 h-4 shrink-0 mt-0.5"
-                style={{ color: "#a78bfa" }}
+                style={{ color: "#2563EB" }}
               />
               <span>Mumbai, Maharashtra, India</span>
             </div>
@@ -149,26 +216,37 @@ export function Footer() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5"
                   style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    color: "rgba(255,255,255,0.6)",
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "8px",
+                    background: "rgba(37,99,235,0.05)",
+                    border: "1px solid rgba(37,99,235,0.15)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#6B7280",
+                    transition:
+                      "background 0.25s ease, color 0.25s ease, border-color 0.25s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.background =
+                      "rgba(37,99,235,0.12)";
+                    (e.currentTarget as HTMLAnchorElement).style.color =
+                      "#2563EB";
+                    (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                      "rgba(37,99,235,0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.background =
+                      "rgba(37,99,235,0.05)";
+                    (e.currentTarget as HTMLAnchorElement).style.color =
+                      "#6B7280";
+                    (e.currentTarget as HTMLAnchorElement).style.borderColor =
+                      "rgba(37,99,235,0.15)";
                   }}
                   aria-label={label}
                   data-ocid={`footer-social-${label.toLowerCase()}`}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget;
-                    el.style.background = "rgba(124,58,237,0.2)";
-                    el.style.borderColor = "rgba(124,58,237,0.4)";
-                    el.style.color = "#a78bfa";
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget;
-                    el.style.background = "rgba(255,255,255,0.05)";
-                    el.style.borderColor = "rgba(255,255,255,0.08)";
-                    el.style.color = "rgba(255,255,255,0.6)";
-                  }}
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -178,7 +256,16 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-white/90 text-xs uppercase tracking-[0.15em] mb-6">
+            <h3
+              style={{
+                fontSize: "11px",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase" as const,
+                color: "#1a2332",
+                fontWeight: 600,
+                marginBottom: "24px",
+              }}
+            >
               Quick Links
             </h3>
             <ul className="space-y-3.5">
@@ -186,22 +273,22 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     to={link.href}
-                    className="group flex items-center gap-0 text-sm transition-colors duration-200"
-                    style={{ color: "rgba(255,255,255,0.5)" }}
-                    data-ocid={`footer-link-${link.label.toLowerCase().replace(/\s/g, "-")}`}
+                    style={{
+                      fontSize: "14px",
+                      color: "#6B7280",
+                      textDecoration: "none",
+                      transition: "color 0.2s ease",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = "#a78bfa";
+                      (e.currentTarget as HTMLAnchorElement).style.color =
+                        "#2563EB";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                      (e.currentTarget as HTMLAnchorElement).style.color =
+                        "#6B7280";
                     }}
+                    data-ocid={`footer-link-${link.label.toLowerCase().replace(/\s/g, "-")}`}
                   >
-                    <span
-                      className="inline-block w-0 group-hover:w-3 overflow-hidden transition-all duration-200 shrink-0"
-                      style={{ color: "#a78bfa" }}
-                    >
-                      ›
-                    </span>
                     {link.label}
                   </Link>
                 </li>
@@ -211,7 +298,16 @@ export function Footer() {
 
           {/* Services */}
           <div>
-            <h3 className="font-semibold text-white/90 text-xs uppercase tracking-[0.15em] mb-6">
+            <h3
+              style={{
+                fontSize: "11px",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase" as const,
+                color: "#1a2332",
+                fontWeight: 600,
+                marginBottom: "24px",
+              }}
+            >
               Services
             </h3>
             <ul className="space-y-3.5">
@@ -219,22 +315,22 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className="group flex items-center gap-0 text-sm transition-colors duration-200"
-                    style={{ color: "rgba(255,255,255,0.5)" }}
-                    data-ocid={`footer-service-${link.label.toLowerCase().replace(/\s/g, "-")}`}
+                    style={{
+                      fontSize: "14px",
+                      color: "#6B7280",
+                      textDecoration: "none",
+                      transition: "color 0.2s ease",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = "#a78bfa";
+                      (e.currentTarget as HTMLAnchorElement).style.color =
+                        "#2563EB";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                      (e.currentTarget as HTMLAnchorElement).style.color =
+                        "#6B7280";
                     }}
+                    data-ocid={`footer-service-${link.label.toLowerCase().replace(/\s/g, "-")}`}
                   >
-                    <span
-                      className="inline-block w-0 group-hover:w-3 overflow-hidden transition-all duration-200 shrink-0"
-                      style={{ color: "#a78bfa" }}
-                    >
-                      ›
-                    </span>
                     {link.label}
                   </Link>
                 </li>
@@ -244,7 +340,16 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold text-white/90 text-xs uppercase tracking-[0.15em] mb-6">
+            <h3
+              style={{
+                fontSize: "11px",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase" as const,
+                color: "#1a2332",
+                fontWeight: 600,
+                marginBottom: "24px",
+              }}
+            >
               Contact
             </h3>
             <ul className="space-y-3.5">
@@ -254,13 +359,22 @@ export function Footer() {
                     href={`https://wa.me/${number}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm transition-colors duration-200"
-                    style={{ color: "rgba(255,255,255,0.5)" }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      fontSize: "14px",
+                      color: "#6B7280",
+                      textDecoration: "none",
+                      transition: "color 0.2s ease",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = "#a78bfa";
+                      (e.currentTarget as HTMLAnchorElement).style.color =
+                        "#2563EB";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                      (e.currentTarget as HTMLAnchorElement).style.color =
+                        "#6B7280";
                     }}
                   >
                     <Phone className="w-3.5 h-3.5 shrink-0" />
@@ -271,13 +385,20 @@ export function Footer() {
               <li>
                 <a
                   href="mailto:maverickdigitals18@gmail.com"
-                  className="text-sm transition-colors duration-200 break-all"
-                  style={{ color: "rgba(255,255,255,0.5)" }}
+                  style={{
+                    fontSize: "14px",
+                    color: "#6B7280",
+                    textDecoration: "none",
+                    transition: "color 0.2s ease",
+                    wordBreak: "break-all" as const,
+                  }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "#a78bfa";
+                    (e.currentTarget as HTMLAnchorElement).style.color =
+                      "#2563EB";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                    (e.currentTarget as HTMLAnchorElement).style.color =
+                      "#6B7280";
                   }}
                 >
                   maverickdigitals18@gmail.com
@@ -288,21 +409,28 @@ export function Footer() {
         </div>
       </div>
 
-      {/* ─── Bottom Bar ─────────────────────────── */}
-      <div
-        className="relative"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-      >
+      {/* ─── Bottom Bar ───────────────────────────── */}
+      <div style={{ borderTop: "1px solid #E2E8F0" }}>
         <div
-          className="container mx-auto max-w-7xl px-5 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
-          style={{ color: "rgba(255,255,255,0.35)" }}
+          className="container mx-auto max-w-7xl px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3"
+          style={{ fontSize: "12px", color: "#94A3B8" }}
         >
           <span>© {year} Maverick Digitals. All rights reserved.</span>
           <a
             href={caffeineUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-colors duration-200 hover:text-white/60"
+            style={{
+              color: "#94A3B8",
+              textDecoration: "none",
+              transition: "color 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "#2563EB";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "#94A3B8";
+            }}
           >
             Built with love using caffeine.ai
           </a>

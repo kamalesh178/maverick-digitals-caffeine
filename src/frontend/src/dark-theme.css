@@ -1,0 +1,106 @@
+/* Maverick Digitals — White Premium Theme */
+/* Reference: uploaded brand photo palette */
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a2332;
+  --card: #f8fafc;
+  --card-foreground: #1a2332;
+  --popover: #ffffff;
+  --popover-foreground: #1a2332;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #eff6ff;
+  --secondary-foreground: #1a2332;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #2563eb;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #f1f5f9;
+  --ring: #2563eb;
+}
+
+html,
+body {
+  background-color: #ffffff;
+  color: #374151;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  background: #f8fafc;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
+}
+
+/* Background overrides */
+.bg-background {
+  background-color: #ffffff !important;
+}
+.bg-card {
+  background-color: #f8fafc !important;
+}
+.bg-muted {
+  background-color: #f1f5f9 !important;
+}
+.bg-secondary {
+  background-color: #eff6ff !important;
+}
+.bg-popover {
+  background-color: #ffffff !important;
+}
+
+/* Form fields */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  color: #1a2332;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
+}
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: -0.02em;
+}
+
+/* Premium ambient glow for sections */
+.section-glow {
+  position: relative;
+}
+.section-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(37, 99, 235, 0.05) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 0;
+}

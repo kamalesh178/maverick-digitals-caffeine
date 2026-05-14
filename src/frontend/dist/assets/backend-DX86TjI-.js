@@ -1,11 +1,4 @@
-// Backend API client — typed functions calling backend canister methods
-// Note: backend.d.ts currently has empty interface. These are typed stubs
-// that will be wired to real methods once bindgen reflects the backend schema.
-
-import type { BlogPost, ContactInquiry } from "@/types";
-
-// Simulated local data for development
-const MOCK_POSTS: BlogPost[] = [
+const MOCK_POSTS = [
   {
     id: BigInt(1),
     title: "Unlocking the Viral Loop: How Mumbai Brands Are Winning Social Media",
@@ -15,9 +8,9 @@ const MOCK_POSTS: BlogPost[] = [
     author: "Maverick Team",
     imageUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&h=500&fit=crop&auto=format",
     tags: ["viral", "social media", "Mumbai"],
-    createdAt: BigInt(1704067200000),
-    updatedAt: BigInt(1704067200000),
-    published: true,
+    createdAt: BigInt(17040672e5),
+    updatedAt: BigInt(17040672e5),
+    published: true
   },
   {
     id: BigInt(2),
@@ -28,9 +21,9 @@ const MOCK_POSTS: BlogPost[] = [
     author: "Maverick Team",
     imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=500&fit=crop&auto=format",
     tags: ["paid ads", "ROI", "Meta Ads"],
-    createdAt: BigInt(1706745600000),
-    updatedAt: BigInt(1706745600000),
-    published: true,
+    createdAt: BigInt(17067456e5),
+    updatedAt: BigInt(17067456e5),
+    published: true
   },
   {
     id: BigInt(3),
@@ -41,9 +34,9 @@ const MOCK_POSTS: BlogPost[] = [
     author: "Maverick Team",
     imageUrl: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=800&h=500&fit=crop&auto=format",
     tags: ["content", "conversion", "strategy"],
-    createdAt: BigInt(1709424000000),
-    updatedAt: BigInt(1709424000000),
-    published: true,
+    createdAt: BigInt(1709424e6),
+    updatedAt: BigInt(1709424e6),
+    published: true
   },
   {
     id: BigInt(4),
@@ -54,9 +47,9 @@ const MOCK_POSTS: BlogPost[] = [
     author: "Muskan Rathod",
     imageUrl: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&auto=format&fit=crop",
     tags: ["AI", "Performance Marketing", "Digital Advertising", "ROI"],
-    createdAt: BigInt(1746057600000),
-    updatedAt: BigInt(1746057600000),
-    published: true,
+    createdAt: BigInt(17460576e5),
+    updatedAt: BigInt(17460576e5),
+    published: true
   },
   {
     id: BigInt(5),
@@ -67,9 +60,9 @@ const MOCK_POSTS: BlogPost[] = [
     author: "Muskan Rathod",
     imageUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&auto=format&fit=crop",
     tags: ["UGC", "Content Strategy", "Social Proof", "Conversions"],
-    createdAt: BigInt(1746144000000),
-    updatedAt: BigInt(1746144000000),
-    published: true,
+    createdAt: BigInt(1746144e6),
+    updatedAt: BigInt(1746144e6),
+    published: true
   },
   {
     id: BigInt(6),
@@ -80,31 +73,27 @@ const MOCK_POSTS: BlogPost[] = [
     author: "Dhaval Shah",
     imageUrl: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&auto=format&fit=crop",
     tags: ["Web Design", "Conversion Rate Optimization", "Landing Pages", "UX"],
-    createdAt: BigInt(1746230400000),
-    updatedAt: BigInt(1746230400000),
-    published: true,
-  },
+    createdAt: BigInt(17462304e5),
+    updatedAt: BigInt(17462304e5),
+    published: true
+  }
 ];
-
-export async function getAllBlogPosts(): Promise<BlogPost[]> {
-  // When backend methods are available: return actor.getAllBlogPosts()
+async function getAllBlogPosts() {
   return MOCK_POSTS;
 }
-
-export async function getBlogPostById(id: bigint): Promise<BlogPost | null> {
-  // When backend methods are available: return actor.getBlogPostById(id)
+async function getBlogPostById(id) {
   return MOCK_POSTS.find((p) => p.id === id) ?? null;
 }
-
-export async function getBlogPostsByCategory(category: string): Promise<BlogPost[]> {
-  // When backend methods are available: return actor.getBlogPostsByCategory(category)
+async function getBlogPostsByCategory(category) {
   return MOCK_POSTS.filter((p) => p.category === category);
 }
-
-export async function submitContactInquiry(
-  inquiry: Omit<ContactInquiry, "id" | "createdAt">
-): Promise<{ success: boolean; message: string }> {
-  // When backend methods are available: return actor.submitContactInquiry(inquiry)
+async function submitContactInquiry(inquiry) {
   console.log("Contact inquiry submitted:", inquiry);
   return { success: true, message: "Thank you! We'll get back to you within 24 hours." };
 }
+export {
+  getBlogPostsByCategory as a,
+  getBlogPostById as b,
+  getAllBlogPosts as g,
+  submitContactInquiry as s
+};

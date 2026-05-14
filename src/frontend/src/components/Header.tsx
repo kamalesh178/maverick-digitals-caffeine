@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
+import { AnimatePresence, motion, useScroll, useSpring } from "motion/react";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
@@ -17,8 +17,15 @@ export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 35,
+    restDelta: 0.001,
+  });
+
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 30);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -36,21 +43,25 @@ export function Header() {
   return (
     <header
       data-ocid="header-nav"
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "py-3 border-b" : "py-5 border-b border-transparent",
-      )}
       style={{
-        background: scrolled
-          ? "rgba(10, 10, 10, 0.95)"
-          : "rgba(10, 10, 10, 0.75)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        borderBottomColor: scrolled ? "rgba(255,255,255,0.08)" : "transparent",
+        background: scrolled ? "rgba(255,255,255,0.95)" : "transparent",
+        backdropFilter: scrolled ? "blur(12px) saturate(1.4)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(12px) saturate(1.4)" : "none",
+        borderBottom: scrolled ? "1px solid #E2E8F0" : "1px solid transparent",
+        transition:
+          "background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease",
       }}
+      className="fixed top-0 left-0 right-0 z-50 py-5 transition-all duration-[400ms]"
     >
-      <div className="container mx-auto px-5 flex items-center justify-between max-w-7xl">
-        {/* Logo — left */}
+      {/* Blue scroll progress bar */}
+      <motion.div
+        className="absolute bottom-0 left-0 right-0 h-[2px] origin-left pointer-events-none z-10"
+        style={{ scaleX, background: "#2563EB" }}
+        aria-hidden="true"
+      />
+
+      <div className="container mx-auto px-6 flex items-center justify-between max-w-7xl">
+        {/* Logo */}
         <Link
           to="/"
           className="flex items-center shrink-0"
@@ -60,29 +71,11 @@ export function Header() {
           <img
             src="/assets/images/logo.webp"
             alt="Maverick Digitals"
-            className="h-9 w-auto object-contain"
-            onError={(e) => {
-              const img = e.currentTarget;
-              img.style.display = "none";
-              const fallback = img.nextElementSibling as HTMLElement | null;
-              if (fallback) fallback.style.display = "block";
-            }}
+            className="h-8 w-auto object-contain"
           />
-          <span
-            className="font-bold text-xl hidden"
-            style={{
-              display: "none",
-              background: "linear-gradient(135deg, #a78bfa, #67e8f9)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Maverick Digitals
-          </span>
         </Link>
 
-        {/* Desktop Nav — center */}
+        {/* Desktop Nav */}
         <nav
           className="hidden md:flex items-center gap-1"
           aria-label="Main navigation"
@@ -93,169 +86,259 @@ export function Header() {
               <Link
                 key={link.href}
                 to={link.href}
-                className={cn(
-                  "relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200",
-                  isActive ? "text-white" : "text-white/60 hover:text-white",
-                )}
+                style={{
+                  fontSize: "13px",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: isActive ? "#2563EB" : "#374151",
+                  transition: "color 0.2s ease",
+                  fontWeight: 400,
+                  padding: "6px 16px",
+                  position: "relative",
+                }}
+                className="hover:[color:#2563EB] transition-colors"
                 aria-current={isActive ? "page" : undefined}
                 data-ocid={`nav-link-${link.label.toLowerCase()}`}
-                style={
-                  isActive ? { background: "rgba(124,58,237,0.12)" } : undefined
-                }
               >
-                <span className="relative z-10">{link.label}</span>
-                {/* Active underline */}
-                <span
-                  className={cn(
-                    "absolute bottom-[4px] left-1/2 -translate-x-1/2 h-[2px] rounded-full transition-all duration-300",
-                    isActive
-                      ? "w-[60%] opacity-100"
-                      : "w-0 opacity-0 group-hover:w-[60%] group-hover:opacity-80",
-                  )}
-                  style={{
-                    background: "linear-gradient(90deg, #7c3aed, #06b6d4)",
-                  }}
-                />
+                {link.label}
+                {isActive && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      bottom: "-2px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: "20px",
+                      height: "1px",
+                      background: "#2563EB",
+                      borderRadius: "1px",
+                    }}
+                  />
+                )}
               </Link>
             );
           })}
         </nav>
 
-        {/* CTA — right */}
+        {/* Desktop CTA */}
         <div className="hidden md:flex items-center">
           <button
             type="button"
             onClick={goToContact}
             data-ocid="header-cta"
-            className="btn-ripple px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all duration-200 hover:shadow-glow-purple hover:-translate-y-0.5"
-            style={{ background: "linear-gradient(135deg, #7c3aed, #06b6d4)" }}
+            style={{
+              fontSize: "13px",
+              letterSpacing: "0.08em",
+              fontWeight: 500,
+              padding: "8px 20px",
+              borderRadius: "2px",
+              border: "1px solid rgba(37,99,235,0.4)",
+              color: "#2563EB",
+              background: "rgba(37,99,235,0.06)",
+              cursor: "pointer",
+              transition:
+                "background 0.25s ease, border-color 0.25s ease, color 0.25s ease",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "rgba(37,99,235,0.12)";
+              (e.currentTarget as HTMLButtonElement).style.borderColor =
+                "rgba(37,99,235,0.65)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "rgba(37,99,235,0.06)";
+              (e.currentTarget as HTMLButtonElement).style.borderColor =
+                "rgba(37,99,235,0.4)";
+            }}
           >
             Get Started
           </button>
         </div>
 
-        {/* Mobile toggle */}
+        {/* Mobile Toggle */}
         <button
           type="button"
-          className="md:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200"
+          style={{
+            color: "#374151",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            padding: "8px",
+          }}
+          className="md:hidden"
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Close menu" : "Open menu"}
           aria-expanded={isOpen}
           data-ocid="mobile-menu-toggle"
         >
-          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          <AnimatePresence mode="wait" initial={false}>
+            {isOpen ? (
+              <motion.span
+                key="close"
+                initial={{ opacity: 0, rotate: -45 }}
+                animate={{ opacity: 1, rotate: 0 }}
+                exit={{ opacity: 0, rotate: 45 }}
+                transition={{ duration: 0.18 }}
+                className="block"
+              >
+                <X className="w-5 h-5" />
+              </motion.span>
+            ) : (
+              <motion.span
+                key="open"
+                initial={{ opacity: 0, rotate: 45 }}
+                animate={{ opacity: 1, rotate: 0 }}
+                exit={{ opacity: 0, rotate: -45 }}
+                transition={{ duration: 0.18 }}
+                className="block"
+              >
+                <Menu className="w-5 h-5" />
+              </motion.span>
+            )}
+          </AnimatePresence>
         </button>
       </div>
 
       {/* Mobile Menu */}
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <button
-            type="button"
-            className="md:hidden fixed inset-0 z-40 w-full h-full cursor-default"
-            style={{
-              background: "rgba(0,0,0,0.6)",
-              backdropFilter: "blur(4px)",
-            }}
-            onClick={() => setIsOpen(false)}
-            aria-label="Close menu"
-            tabIndex={-1}
-          />
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              className="md:hidden fixed inset-0 z-40"
+              style={{
+                background: "rgba(0,0,0,0.25)",
+                backdropFilter: "blur(4px)",
+              }}
+              onClick={() => setIsOpen(false)}
+              aria-hidden="true"
+            />
 
-          {/* Panel */}
-          <div
-            className="md:hidden fixed top-0 left-0 right-0 z-50 flex flex-col border-b"
-            style={{
-              background: "rgba(10,10,10,0.98)",
-              backdropFilter: "blur(24px)",
-              borderBottomColor: "rgba(255,255,255,0.08)",
-            }}
-          >
-            {/* Panel header */}
-            <div
-              className="flex items-center justify-between px-5 py-4 border-b"
-              style={{ borderBottomColor: "rgba(255,255,255,0.06)" }}
+            {/* Panel */}
+            <motion.div
+              key="mobile-panel"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="md:hidden fixed top-0 left-0 right-0 z-50 flex flex-col"
+              style={{
+                background: "rgba(255,255,255,0.98)",
+                backdropFilter: "blur(20px)",
+                borderBottom: "1px solid #E2E8F0",
+              }}
+              aria-label="Mobile navigation"
             >
-              <Link to="/" onClick={() => setIsOpen(false)} aria-label="Home">
-                <img
-                  src="/assets/images/logo.webp"
-                  alt="Maverick Digitals"
-                  className="h-8 w-auto object-contain"
-                  onError={(e) => {
-                    const img = e.currentTarget;
-                    img.style.display = "none";
+              {/* Panel header */}
+              <div
+                className="flex items-center justify-between px-6 py-5"
+                style={{ borderBottom: "1px solid #E2E8F0" }}
+              >
+                <Link to="/" onClick={() => setIsOpen(false)} aria-label="Home">
+                  <img
+                    src="/assets/images/logo.webp"
+                    alt="Maverick Digitals"
+                    className="h-7 w-auto object-contain"
+                  />
+                </Link>
+                <button
+                  type="button"
+                  style={{
+                    color: "#64748B",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "6px",
                   }}
-                />
-              </Link>
-              <button
-                type="button"
-                className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors duration-200"
-                onClick={() => setIsOpen(false)}
-                aria-label="Close menu"
-                data-ocid="mobile-menu-close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+                  onClick={() => setIsOpen(false)}
+                  aria-label="Close menu"
+                  data-ocid="mobile-menu-close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
-            {/* Nav links */}
-            <nav className="flex flex-col px-4 py-3">
-              {NAV_LINKS.map((link) => {
-                const isActive = location.pathname === link.href;
-                return (
-                  <Link
-                    key={link.href}
-                    to={link.href}
-                    className={cn(
-                      "flex items-center justify-between px-3 py-3.5 rounded-xl font-semibold text-lg transition-colors duration-200",
-                      isActive
-                        ? "text-white"
-                        : "text-white/60 hover:text-white hover:bg-white/[0.03]",
-                    )}
-                    style={
-                      isActive
-                        ? { background: "rgba(124,58,237,0.1)" }
-                        : undefined
-                    }
-                    onClick={() => setIsOpen(false)}
-                    data-ocid={`mobile-nav-${link.label.toLowerCase()}`}
-                  >
-                    <span>{link.label}</span>
-                    {isActive && (
-                      <span
-                        className="w-1.5 h-1.5 rounded-full"
+              {/* Nav links */}
+              <nav className="flex flex-col px-6 py-6 gap-1">
+                {NAV_LINKS.map((link, i) => {
+                  const isActive = location.pathname === link.href;
+                  return (
+                    <motion.div
+                      key={link.href}
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        delay: 0.04 + i * 0.055,
+                        duration: 0.28,
+                        ease: [0.16, 1, 0.3, 1],
+                      }}
+                    >
+                      <Link
+                        to={link.href}
                         style={{
-                          background:
-                            "linear-gradient(135deg, #7c3aed, #06b6d4)",
+                          display: "block",
+                          padding: "12px 0",
+                          fontSize: "18px",
+                          fontWeight: 500,
+                          letterSpacing: "0.03em",
+                          color: isActive ? "#2563EB" : "#374151",
+                          borderBottom: "1px solid #E2E8F0",
+                          transition: "color 0.2s ease",
                         }}
-                      />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
+                        onClick={() => setIsOpen(false)}
+                        data-ocid={`mobile-nav-${link.label.toLowerCase()}`}
+                      >
+                        {link.label}
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </nav>
 
-            {/* Mobile CTA */}
-            <div className="px-5 pb-6 pt-2">
-              <button
-                type="button"
-                className="w-full btn-ripple py-3.5 rounded-full font-semibold text-white transition-all duration-200"
-                style={{
-                  background: "linear-gradient(135deg, #7c3aed, #06b6d4)",
+              {/* Mobile CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: 0.34,
+                  duration: 0.28,
+                  ease: [0.16, 1, 0.3, 1],
                 }}
-                onClick={() => {
-                  setIsOpen(false);
-                  goToContact();
-                }}
-                data-ocid="mobile-cta"
+                className="px-6 pb-8 pt-2"
               >
-                Get Started
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+                <button
+                  type="button"
+                  style={{
+                    width: "100%",
+                    padding: "14px 24px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(37,99,235,0.35)",
+                    color: "#2563EB",
+                    background: "rgba(37,99,235,0.06)",
+                    fontSize: "14px",
+                    letterSpacing: "0.08em",
+                    fontWeight: 500,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    setIsOpen(false);
+                    goToContact();
+                  }}
+                  data-ocid="mobile-cta"
+                >
+                  Get Started
+                </button>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

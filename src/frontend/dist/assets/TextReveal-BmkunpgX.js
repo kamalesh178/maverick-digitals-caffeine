@@ -1,5 +1,4 @@
-import { r as reactExports, j as jsxRuntimeExports } from "./index-jpOSPqTZ.js";
-import { r as resolveElements, m as motion } from "./proxy-B5rRmvmM.js";
+import { d as resolveElements, r as reactExports, j as jsxRuntimeExports, m as motion } from "./index-Cj8-jWY_.js";
 const thresholds = {
   some: 0,
   all: 1
@@ -52,45 +51,48 @@ function useInView(ref, { root, margin, amount, once = false, initial = false } 
   return isInView;
 }
 const EXPO_OUT = [0.16, 1, 0.3, 1];
-const QUART_OUT = [0.25, 0.46, 0.45, 0.94];
 const SINGLE_VARIANTS = {
   "fade-up": {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 24, scale: 0.97 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, ease: EXPO_OUT }
+      scale: 1,
+      transition: { duration: 0.8, ease: EXPO_OUT }
     }
   },
   "fade-in": {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { duration: 0.6, ease: QUART_OUT }
-    }
-  },
-  "slide-left": {
-    hidden: { opacity: 0, x: -56 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.7, ease: EXPO_OUT }
-    }
-  },
-  "slide-right": {
-    hidden: { opacity: 0, x: 56 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.7, ease: EXPO_OUT }
-    }
-  },
-  "scale-up": {
-    hidden: { opacity: 0, scale: 0.9 },
+    hidden: { opacity: 0, scale: 0.98 },
     visible: {
       opacity: 1,
       scale: 1,
-      transition: { duration: 0.65, ease: EXPO_OUT }
+      transition: { duration: 0.8, ease: EXPO_OUT }
+    }
+  },
+  "slide-left": {
+    hidden: { opacity: 0, x: 32, scale: 0.97 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: { duration: 0.8, ease: EXPO_OUT }
+    }
+  },
+  "slide-right": {
+    hidden: { opacity: 0, x: -32, scale: 0.97 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: { duration: 0.8, ease: EXPO_OUT }
+    }
+  },
+  "scale-up": {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.85, ease: EXPO_OUT }
     }
   }
 };
@@ -99,17 +101,18 @@ const STAGGER_CONTAINER = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.09,
-      delayChildren: 0.05
+      staggerChildren: 0.1,
+      delayChildren: 0
     }
   }
 };
 const STAGGER_ITEM = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 24, scale: 0.97 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: EXPO_OUT }
+    scale: 1,
+    transition: { duration: 0.85, ease: EXPO_OUT }
   }
 };
 function StaggerItem({
@@ -136,6 +139,7 @@ function AnimatedSection({
         variants: STAGGER_CONTAINER,
         transition: { delay },
         className,
+        style: { willChange: "opacity" },
         children: Array.isArray(children) ? children.map((child, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: positional stagger children
           /* @__PURE__ */ jsxRuntimeExports.jsx(StaggerItem, { children: child }, i)
@@ -158,6 +162,78 @@ function AnimatedSection({
     }
   );
 }
+function TextReveal({
+  text,
+  as: Tag = "h2",
+  className = "",
+  style,
+  delay = 0,
+  staggerMs = 40
+}) {
+  const containerRef = reactExports.useRef(null);
+  const wordRefs = reactExports.useRef([]);
+  const words = text.split(" ");
+  reactExports.useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            observer.disconnect();
+            for (const span of wordRefs.current) {
+              if (span) {
+                span.style.transform = "translateY(0)";
+                span.style.opacity = "1";
+              }
+            }
+          }
+        }
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Tag,
+    {
+      ref: containerRef,
+      className,
+      style,
+      "aria-label": text,
+      children: words.map((word, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "span",
+        {
+          style: {
+            display: "inline-block",
+            overflow: "hidden",
+            marginRight: "0.25em",
+            verticalAlign: "bottom"
+          },
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "span",
+            {
+              ref: (el) => {
+                wordRefs.current[index] = el;
+              },
+              style: {
+                display: "inline-block",
+                transform: "translateY(100%)",
+                opacity: 0,
+                transition: `transform 0.6s cubic-bezier(0.16,1,0.3,1) ${delay + index * staggerMs}ms, opacity 0.4s ease ${delay + index * staggerMs}ms`,
+                willChange: "transform"
+              },
+              children: word
+            }
+          )
+        },
+        index
+      ))
+    }
+  );
+}
 export {
-  AnimatedSection as A
+  AnimatedSection as A,
+  TextReveal as T
 };

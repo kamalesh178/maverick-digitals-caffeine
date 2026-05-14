@@ -1,4 +1,5 @@
 import { Layout } from "@/components/Layout";
+import { PageIntro } from "@/components/PageIntro";
 import {
   Outlet,
   RouterProvider,
@@ -19,14 +20,8 @@ function PageLoader() {
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <div
-          className="w-10 h-10 rounded-full animate-glow-pulse"
-          style={{ background: "linear-gradient(135deg, #7c3aed, #06b6d4)" }}
-        />
-        <p
-          className="text-sm animate-pulse"
-          style={{ color: "rgba(255,255,255,0.5)" }}
-        >
+        <div className="w-10 h-10 rounded-full gradient-primary animate-glow-pulse" />
+        <p className="text-muted-foreground font-display text-sm animate-pulse">
           Loading...
         </p>
       </div>
@@ -93,5 +88,10 @@ declare module "@tanstack/react-router" {
 }
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <PageIntro />
+      <RouterProvider router={router} />
+    </>
+  );
 }

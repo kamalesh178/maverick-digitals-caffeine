@@ -1,27 +1,28 @@
 {
-  "overview": "Maverick Digitals — a premium dark-themed digital marketing agency website for a Mumbai-based agency (founded 2024). Features 5 pages: Home, About, Services, Blog, and Contact, all redesigned with a dark aesthetic matching the Intellix AI agency template style — near-black backgrounds, white text, purple-to-cyan gradient accents, glass-morphism cards, and smooth CSS animations.",
+  "overview": "Maverick Digitals is a premium multi-page agency website with a cinematic dark theme inspired by hashgraphvc.com, featuring word-by-word scroll text reveals, ambient glow effects, animated stat counters, horizontal marquee strips, and smooth easing across all 5 pages.",
   "features": [
-    "Dark theme with near-black background and white typography",
-    "Purple-to-cyan gradient accents on CTAs and headlines",
-    "Glass-morphism cards across all sections",
-    "7 services displayed in a clean card grid",
-    "Smooth scroll-triggered fade-in animations",
-    "Fully functional contact form connected to backend",
-    "Blog with 3 posts and visible thumbnails",
-    "Team section with Muskan Rathod and Dhaval Shah",
-    "Stats: 10M+ Views, 35+ Brands Scaled, Founded 2024",
-    "Instagram and LinkedIn social links"
+    "Dark premium theme (#080808 background, amber and teal accents)",
+    "Word-by-word scroll text reveals on all section headings",
+    "Animated stat counters that count up when scrolled into view",
+    "Horizontal scrolling marquee strips with services and brand values",
+    "Atmospheric ambient glow effects in hero and section areas",
+    "Transparent header that frosts and darkens on scroll",
+    "3D spiral scroll animation on Services page",
+    "Cinematic page-load intro animation",
+    "Rule-based AI chatbot floating bubble",
+    "Fully functional contact form with validation",
+    "6 blog posts with visible thumbnails",
+    "Team profiles for Muskan Rathod and Dhaval Shah"
   ],
-  "category": "agency-marketing",
+  "category": "business-website",
   "tags": [
     "agency",
     "dark-theme",
+    "scroll-animations",
+    "premium",
     "digital-marketing",
     "react",
-    "motoko",
-    "tailwind",
-    "animations",
-    "gradient"
+    "tailwind"
   ],
-  "last_updated": "2026-05-01T10:07:59.077Z"
+  "last_updated": "2026-05-12T11:45:23.734Z"
 }
